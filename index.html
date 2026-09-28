@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ทายเพลงไทย</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff7ef;--fg:#2a1d15;--card:#fff;--mut:#8a7565;--ac:#e8590c;--ok:#2f9e44;--bad:#e03131;--bd:#ecd9c8}
+@media (prefers-color-scheme:dark){:root{--bg:#1b1410;--fg:#f6e9de;--card:#2a1f18;--mut:#b29a88;--bd:#43322a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:'Prompt',system-ui,sans-serif;min-height:100vh}
+main{max-width:560px;margin:0 auto;padding:16px 16px 40px}
+h1{font-size:26px;margin:8px 0 2px;text-align:center}
+.sub{color:var(--mut);text-align:center;margin:0 0 18px;font-size:14px}
+.hide{display:none!important}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:16px;margin-bottom:14px}
+button{font-family:inherit;font-size:16px;border:0;border-radius:12px;padding:12px 16px;cursor:pointer;background:var(--ac);color:#fff;font-weight:600}
+button.g{background:transparent;color:var(--fg);border:1px solid var(--bd)}
+button.chip{font-size:13px;padding:6px 12px;border-radius:99px;margin:3px 2px}
+button.chip.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+button:disabled{opacity:.4;cursor:not-allowed}
+button small{display:block;font-weight:400;opacity:.8;font-size:12px}
+.row{display:flex;gap:8px}.row>*{flex:1}
+select,input[type=text]{width:100%;font-family:inherit;font-size:16px;padding:11px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--fg)}
+.mode{display:block;width:100%;text-align:left;margin-bottom:10px;padding:16px}
+.mode b{font-size:18px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.top button{padding:8px 12px;font-size:14px}
+#sb{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tm{flex:1;min-width:80px;border:2px solid var(--bd);border-radius:12px;padding:6px;text-align:center;font-size:12px}
+.tm.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 15%,transparent)}
+.tm b{display:block;font-size:22px}
+.bar{display:flex;gap:3px;height:12px;margin:6px 0 4px}
+.seg{flex:1;background:var(--bd);border-radius:3px;position:relative;overflow:hidden}
+.seg.on{background:color-mix(in srgb,var(--ac) 35%,var(--bd))}
+.fill{position:absolute;inset:0 auto 0 0;width:0;background:var(--ac)}
+.meter{height:10px;background:var(--bd);border-radius:5px;overflow:hidden;margin:8px 0}.meter div{height:100%;background:var(--ac);width:0}
+.play{width:76px;height:76px;border-radius:50%;font-size:28px;display:block;margin:12px auto}
+.time{text-align:center;color:var(--mut);font-size:14px}
+.slot{border:1px solid var(--bd);border-radius:10px;padding:9px 12px;margin-bottom:6px;font-size:15px;min-height:42px;color:var(--mut)}
+.slot.x{color:var(--bad);border-color:var(--bad)}.slot.s{font-style:italic}.slot.now{border-style:dashed}
+.sw{position:relative}
+.dd{position:absolute;left:0;right:0;bottom:100%;margin-bottom:4px;background:var(--card);border:1px solid var(--bd);border-radius:12px;max-height:220px;overflow:auto;z-index:5;display:none}
+.dd div{padding:10px 12px;cursor:pointer;font-size:15px;border-bottom:1px solid var(--bd)}
+.dd div:last-child{border:0}.dd div.h,.dd div:hover{background:var(--bd)}
+.dd small{color:var(--mut);display:block}
+#pb{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin:12px 0}
+.pbtn{background:var(--c);color:#fff;padding:18px 8px}
+.cho{display:block;width:100%;text-align:left;margin-bottom:8px}.cho small{color:var(--mut)}
+.res{text-align:center}.res h2{margin:4px 0}.ok{color:var(--ok)}.no{color:var(--bad)}
+.res img{width:120px;height:120px;border-radius:12px;margin:6px auto;display:block}
+label.cb{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--mut);margin:10px 0}
+.hint{font-size:13px;color:var(--mut);line-height:1.6}
+.lab{font-weight:600;margin:14px 0 6px;display:block}
+</style></head><body><main>
+<div class="top hide" id="top"><button class="g" id="exit">← ออกจากเกม</button><b id="ri"></b></div>
+<div id="hero"><h1>🎧 ทายเพลงไทย</h1><p class="sub">เล่นคนเดียวหรือเล่นกับเพื่อนบนเครื่องเดียวกัน</p></div>
+
+<section id="home">
+ <button class="mode card" data-m="heardle"><b>🎧 ฟังสั้นๆ</b><small>ฟังทีละนิด 0.1 → 16 วิ ผลัดกันทายทีละตา ยิ่งทายได้ไวยิ่งได้แต้มเยอะ</small></button>
+ <button class="mode card" data-m="buzz"><b>⚡ แย่งกดตอบ (พิมพ์)</b><small>เพลงเล่นไป ใครรู้ก่อนกดปุ่มตัวเอง แล้วพิมพ์ชื่อ ยิ่งกดไวแต้มยิ่งเยอะ ผิดโดนหัก 1</small></button>
+ <button class="mode card" data-m="choice"><b>🔘 แย่งกดตอบ (ช้อยส์)</b><small>เหมือนกันแต่ตอบด้วยการเลือก 4 ตัวเลือก ตัดสินกันด้วยความไว</small></button>
+</section>
+
+<section id="setup" class="hide">
+ <div class="row" style="margin-bottom:10px;align-items:center"><button class="g" id="back" style="flex:0 0 auto">← กลับ</button><b id="mt" style="text-align:right"></b></div>
+ <div class="card">
+  <span class="lab" style="margin-top:0">ศิลปิน / คำค้นหา</span>
+  <div id="chips"></div>
+  <input type="text" id="terms" placeholder="หรือพิมพ์เอง คั่นด้วยคอมมา เช่น เบิร์ด ธงไชย, ลุลา" style="margin-top:6px">
+  <span class="lab">ผู้เล่น (เลือกทีมเดียวกันเพื่อรวมแต้ม)</span>
+  <div id="pl"></div>
+  <button class="g" id="addp" style="width:100%">+ เพิ่มผู้เล่น</button>
+  <div class="row"><div><span class="lab">ทายอะไร</span><select id="subj"><option value="title">ชื่อเพลง</option><option value="artist">ชื่อศิลปิน</option></select></div>
+  <div><span class="lab">จำนวนรอบ</span><select id="rounds"><option>5</option><option selected>10</option><option>15</option><option>20</option></select></div></div>
+  <label class="cb"><input type="checkbox" id="rnd"> เริ่มจากช่วงสุ่มของคลิป (ไม่เริ่มที่วินาทีแรก)</label>
+  <button id="start" style="width:100%">เริ่มเกม</button>
+  <p class="hint" id="msg"></p>
+ </div>
+ <p class="hint">เพลงและคลิปตัวอย่าง 30 วินาทีมาจาก iTunes Search API</p>
+</section>
+
+<section id="game" class="hide">
+ <div id="sb"></div>
+ <div id="hd">
+  <div class="card"><div class="bar" id="hbar"></div><div class="time" id="htm"></div>
+   <button class="play" id="hplay" aria-label="เล่น">▶</button></div>
+  <div id="hslots"></div>
+  <div id="hin"><div class="sw"><div class="dd" id="hdd"></div><input type="text" id="hq" placeholder="พิมพ์ค้นหา..." autocomplete="off"></div>
+   <div class="row" style="margin-top:10px"><button class="g" id="hskip"></button><button id="hgo" disabled>ทาย</button></div></div>
+ </div>
+ <div id="bz">
+  <div class="card res"><div id="bstat" style="min-height:44px"></div>
+   <div class="meter"><div id="bmeter"></div></div>
+   <button id="bstart">▶ เริ่มเพลง</button></div>
+  <div id="pb"></div>
+  <div id="bans" class="card hide">
+   <div class="row" style="align-items:center;margin-bottom:8px"><b>ตอบเลย!</b><b id="bcd" style="text-align:right;font-size:22px"></b></div>
+   <div id="btype"><div class="sw"><div class="dd" id="bdd"></div><input type="text" id="bq" placeholder="พิมพ์ค้นหา..." autocomplete="off"></div>
+    <button id="bok" disabled style="width:100%;margin-top:10px">ยืนยัน</button></div>
+   <div id="bcho"></div>
+  </div>
+ </div>
+ <div id="result" class="card res hide"></div>
+</section>
+<section id="final" class="hide"></section>
+<audio id="au" preload="auto"></audio>
+</main>
+<script>
+const STEPS=[0.1,0.5,1,2,4,8,16],MAXT=20,ANS=10;
+const KEYS=['KeyA','KeyL','KeyZ','KeyM','KeyQ','KeyP'],COL=['#e8590c','#1c7ed6','#2f9e44','#ae3ec9','#f08c00','#0c8599'];
+const PRESETS=["Bodyslam","Palmy","Lula","Getsunova","Cocktail","Big Ass","Atom ชนกันต์","Silly Fools","Three Man Down","Musketeers","Slot Machine","Tilly Birds","Scrubb","เบิร์ด ธงไชย","Potato","Mild","Paper Planes"];
+const $=id=>document.getElementById(id),au=$('au');
+const norm=s=>s.toLowerCase().replace(/[\s\-_.,'"!?()\[\]]/g,'');
+const base=t=>t.replace(/\s*[\(\[].*?[\)\]]\s*/g,' ').trim();
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let mode,subj='title',rounds=10,songs=[],cur=null,teams=[],G={},st='',startOff=0,raf=0,tmo=0;
+let picked=new Set(["Bodyslam","Palmy"]),players=[{n:'ผู้เล่น 1',t:0},{n:'ผู้เล่น 2',t:1}];
+const F=()=>subj==='title'?'title':'artist',tl=t=>t.m.join(' + ');
+function show(id){['home','setup','game','final'].forEach(x=>$(x).classList.toggle('hide',x!==id));$('top').classList.toggle('hide',id!=='game');$('hero').classList.toggle('hide',id==='game')}
+function home(){stop();clearInterval(G.cd);st='';show('home')}
+// ---------- iTunes ----------
+function itunes(term){return new Promise((res,rej)=>{
+ const cb='cb'+Math.random().toString(36).slice(2),s=document.createElement('script');
+ const t=setTimeout(()=>{cl();rej()},10000);
+ function cl(){clearTimeout(t);delete window[cb];s.remove()}
+ window[cb]=d=>{cl();res(d.results||[])};s.onerror=()=>{cl();rej()};
+ s.src=`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&country=TH&media=music&entity=song&limit=50&callback=${cb}`;
+ document.head.appendChild(s)})}
+// ---------- menu / setup ----------
+const LBL={heardle:'🎧 ฟังสั้นๆ',buzz:'⚡ แย่งกดตอบ (พิมพ์)',choice:'🔘 แย่งกดตอบ (ช้อยส์)'};
+$('home').onclick=e=>{const b=e.target.closest('.mode');if(!b)return;mode=b.dataset.m;$('mt').textContent=LBL[mode];$('msg').textContent='';show('setup')};
+$('back').onclick=()=>show('home');
+function chips(){$('chips').innerHTML=PRESETS.map(p=>`<button class="chip g ${picked.has(p)?'on':''}" data-p="${esc(p)}">${esc(p)}</button>`).join('')}
+$('chips').onclick=e=>{const p=e.target.dataset.p;if(!p)return;picked.has(p)?picked.delete(p):picked.add(p);chips()};chips();
+function drawPl(){$('pl').innerHTML=players.map((p,i)=>`<div class="row" style="margin-bottom:6px"><input type="text" data-n="${i}" value="${esc(p.n)}" style="flex:3"><select data-t="${i}" style="flex:2">${'ABCD'.split('').map((l,j)=>`<option value="${j}" ${p.t==j?'selected':''}>ทีม ${l}</option>`).join('')}</select>${players.length>1?`<button class="g" data-x="${i}" style="flex:0 0 44px;padding:8px">✕</button>`:''}</div>`).join('');$('addp').classList.toggle('hide',players.length>=6)}
+$('pl').oninput=e=>{if(e.target.dataset.n!=null)players[e.target.dataset.n].n=e.target.value};
+$('pl').onchange=e=>{if(e.target.dataset.t!=null)players[e.target.dataset.t].t=+e.target.value};
+$('pl').onclick=e=>{const x=e.target.dataset.x;if(x!=null){players.splice(x,1);drawPl()}};
+$('addp').onclick=()=>{players.push({n:'ผู้เล่น '+(players.length+1),t:players.length%4});drawPl()};drawPl();
+$('start').onclick=async()=>{
+ const terms=[...picked,...$('terms').value.split(',').map(s=>s.trim()).filter(Boolean)];
+ if(!terms.length){$('msg').textContent='เลือกหรือพิมพ์ศิลปินอย่างน้อย 1 อย่าง';return}
+ subj=$('subj').value;rounds=+$('rounds').value;
+ $('start').disabled=true;$('msg').textContent='กำลังโหลดเพลง...';
+ const map=new Map(),all=await Promise.allSettled(terms.map(itunes));
+ all.forEach(r=>{if(r.status!=='fulfilled')return;r.value.forEach(x=>{
+  if(x.kind!=='song'||!x.trackName||!x.previewUrl)return;
+  const k=norm(base(x.trackName))+'|'+norm(x.artistName);
+  if(!map.has(k))map.set(k,{title:base(x.trackName),artist:x.artistName,url:x.previewUrl,art:(x.artworkUrl100||'').replace('100x100','300x300')})})});
+ songs=[...map.values()];$('start').disabled=false;
+ if(songs.length<5){$('msg').textContent=all.every(r=>r.status==='rejected')?'เชื่อมต่อ iTunes ไม่ได้ ลองใหม่อีกครั้ง':'เจอเพลงน้อยเกินไป ลองเพิ่มศิลปิน';return}
+ const need=mode==='choice'?4:2;
+ if(cand().length<need){$('msg').textContent=`ต้องมี${subj==='artist'?'ศิลปิน':'เพลง'}ไม่ซ้ำอย่างน้อย ${need} รายการ ลองเลือกศิลปินเพิ่ม`;return}
+ $('msg').textContent='';newGame();
+};
+// ---------- shared ----------
+function cand(){const m=new Map();songs.forEach(s=>{const k=norm(s[F()]);if(!m.has(k))m.set(k,{v:s[F()],s:subj==='title'?s.artist:''})});return[...m.values()]}
+function mkAC(q,dd,go){let sel=null,hi=-1,r=[];
+ const show=()=>{const v=norm(q.value);hi=-1;r=v?cand().filter(c=>norm(c.v).includes(v)||norm(c.s).includes(v)).slice(0,30):[];
+  if(!r.length||(sel&&norm(sel.v)===v)){dd.style.display='none';return}
+  dd.innerHTML=r.map((c,i)=>`<div data-i="${i}">${esc(c.v)}${c.s?`<small>${esc(c.s)}</small>`:''}</div>`).join('');dd.style.display='block'};
+ const pick=c=>{sel=c;q.value=c.v;dd.style.display='none';go.disabled=false};
+ q.oninput=()=>{sel=null;go.disabled=true;show()};
+ dd.onmousedown=e=>{const el=e.target.closest('[data-i]');if(el)pick(r[el.dataset.i])};
+ q.onkeydown=e=>{const it=[...dd.children],open=dd.style.display==='block';
+  if(open&&(e.key==='ArrowDown'||e.key==='ArrowUp')){e.preventDefault();hi=(hi+(e.key==='ArrowDown'?1:-1)+it.length)%it.length;it.forEach((x,i)=>x.classList.toggle('h',i==hi));it[hi].scrollIntoView({block:'nearest'})}
+  else if(e.key==='Enter'){e.preventDefault();if(open&&hi>=0)pick(r[hi]);else if(sel)go.click();else if(open&&r.length===1)pick(r[0])}};
+ return{get:()=>sel,reset:()=>{sel=null;q.value='';go.disabled=true;dd.style.display='none'}}}
+const acH=mkAC($('hq'),$('hdd'),$('hgo')),acB=mkAC($('bq'),$('bdd'),$('bok'));
+document.addEventListener('click',e=>{if(!e.target.closest('.sw'))document.querySelectorAll('.dd').forEach(d=>d.style.display='none')});
+function sb(a){$('sb').innerHTML=teams.map((t,i)=>`<div class="tm ${i===a?'on':''}" style="--c:${COL[i%6]}"><small>${esc(tl(t))}</small><b>${t.s}</b></div>`).join('')}
+function stop(){cancelAnimationFrame(raf);clearTimeout(tmo);au.pause();$('hplay').textContent='▶'}
+$('exit').onclick=()=>{if(confirm('ออกจากเกม? คะแนนจะหายทั้งหมด'))home()};
+function newGame(){
+ const ids=[...new Set(players.map(p=>p.t))];
+ teams=ids.map(id=>({s:0,m:players.filter(p=>p.t===id).map(p=>p.n||'?')}));
+ players.forEach(p=>p.ti=ids.indexOf(p.t));
+ G={r:0,used:new Set()};show('game');nextRound();
+}
+function nextRound(){
+ stop();if(G.r>=rounds)return fin();G.r++;
+ let pool=songs.filter(s=>!G.used.has(s.url));if(!pool.length){G.used.clear();pool=songs}
+ cur=pool[Math.random()*pool.length|0];G.used.add(cur.url);
+ startOff=$('rnd').checked?Math.random()*10:0;au.src=cur.url;au.load();
+ $('ri').textContent=`รอบ ${G.r}/${rounds}`;$('result').classList.add('hide');
+ $('hd').classList.toggle('hide',mode!=='heardle');$('bz').classList.toggle('hide',mode==='heardle');
+ mode==='heardle'?hInit():bInit();
+}
+function award(ti,pts){teams[ti].s+=pts;reveal(ti,pts)}
+function reveal(ti,pts){
+ stop();clearInterval(G.cd);st='done';sb(-1);
+ $('hin').classList.add('hide');$('bans').classList.add('hide');$('pb').innerHTML='';
+ const last=G.r>=rounds,r=$('result');r.classList.remove('hide');
+ r.innerHTML=`<h2 class="${ti>=0?'ok':'no'}">${ti>=0?`🎉 ${esc(tl(teams[ti]))} +${pts}`:'😢 ไม่มีใครทายได้'}</h2>${cur.art?`<img src="${cur.art}" alt="">`:''}
+ <p style="font-size:20px;margin:6px 0"><b>${esc(cur.title)}</b></p><p class="hint">${esc(cur.artist)}</p>
+ <div class="row"><button class="g" id="full">▶ ฟังคลิป</button><button id="nx">${last?'ดูผลรวม':'รอบต่อไป'}</button></div>`;
+ $('full').onclick=()=>{if(!au.paused){au.pause();$('full').textContent='▶ ฟังคลิป'}else{au.currentTime=0;au.play();$('full').textContent='⏸ หยุด'}};
+ $('nx').onclick=nextRound;
+}
+function fin(){
+ st='';show('final');const s=[...teams].sort((a,b)=>b.s-a.s);
+ $('final').innerHTML=`<div class="card res"><h2>🏆 จบเกม</h2>${s.map((t,i)=>`<div class="slot" style="color:var(--fg)">${['🥇','🥈','🥉'][i]||(i+1)+'.'} ${esc(tl(t))} — <b>${t.s}</b> แต้ม</div>`).join('')}
+ <div class="row" style="margin-top:12px"><button class="g" id="again">เล่นอีกครั้ง</button><button id="hm">หน้าหลัก</button></div></div>`;
+ $('again').onclick=newGame;$('hm').onclick=home;
+}
+// ---------- โหมดฟังสั้นๆ ----------
+function hInit(){G.step=0;G.g=[];G.ti=(G.r-1)%teams.length;st='h';acH.reset();$('hin').classList.remove('hide');hDraw()}
+function hDraw(){
+ sb(G.ti);
+ $('hbar').innerHTML=STEPS.map((s,i)=>`<div class="seg ${i<=G.step?'on':''}"><div class="fill" id="f${i}"></div></div>`).join('');
+ $('htm').textContent=`ตาของ ${tl(teams[G.ti])} · ฟังได้ ${STEPS[G.step]} วิ · ขั้น ${G.step+1}/${STEPS.length} · ทายถูกได้ ${STEPS.length-G.step} แต้ม`;
+ $('hslots').innerHTML=STEPS.map((_,i)=>{const g=G.g[i];return g?`<div class="slot ${g.skip?'s':'x'}">${g.skip?'⏭ ข้าม':'✕ '+esc(g.t)} <small>(${esc(tl(teams[g.w]))})</small></div>`:`<div class="slot ${i==G.step?'now':''}">&nbsp;</div>`}).join('');
+ $('hskip').textContent=G.step<STEPS.length-1?`ข้าม (+${+(STEPS[G.step+1]-STEPS[G.step]).toFixed(1)} วิ)`:'ยอมแพ้';
+}
+$('hplay').onclick=()=>{if(st!=='h')return;if(!au.paused){stop();return}playClip(STEPS[G.step])};
+function playClip(len){
+ stop();document.querySelectorAll('.fill').forEach(f=>f.style.width='0');
+ au.currentTime=startOff;au.play().catch(()=>{});$('hplay').textContent='⏸';
+ const t0=performance.now(),tick=()=>{const el=(performance.now()-t0)/1000;
+  STEPS.forEach((s,i)=>{const a=i?STEPS[i-1]:0,f=$('f'+i);if(f&&i<=G.step)f.style.width=(Math.max(0,Math.min(1,(el-a)/(s-a)))*100)+'%'});
+  if(el<len)raf=requestAnimationFrame(tick)};
+ tick();tmo=setTimeout(stop,len*1000);
+}
+$('hgo').onclick=()=>{const s=acH.get();if(!s||st!=='h')return;stop();
+ if(norm(s.v)===norm(cur[F()]))return award(G.ti,STEPS.length-G.step);
+ hNext({t:s.v,w:G.ti})};
+$('hskip').onclick=()=>{if(st!=='h')return;stop();hNext({skip:1,w:G.ti})};
+function hNext(g){G.g.push(g);if(G.step>=STEPS.length-1)return reveal(-1);G.step++;G.ti=(G.ti+1)%teams.length;acH.reset();hDraw()}
+// ---------- โหมดแย่งกดตอบ ----------
+function bInit(){
+ st='b0';G.lock=new Set();G.buz=-1;$('bans').classList.add('hide');$('bmeter').style.width='0';
+ $('bstat').innerHTML=`พร้อมแล้วกด "เริ่มเพลง" ใครรู้ก่อนกดปุ่มของตัวเอง<br><small class="hint">คีย์บอร์ด: ${players.map((p,i)=>esc(p.n)+' = '+KEYS[i].slice(3)).join(' · ')}</small>`;
+ $('bstart').classList.remove('hide');sb(-1);bBtns();
+}
+function bBtns(){$('pb').innerHTML=players.map((p,i)=>`<button class="pbtn" data-i="${i}" style="--c:${COL[p.ti%6]}" ${st!=='b1'||G.lock.has(p.ti)?'disabled':''}>${esc(p.n)}<small>[${KEYS[i].slice(3)}]</small></button>`).join('')}
+$('pb').onpointerdown=e=>{const b=e.target.closest('.pbtn');if(b&&!b.disabled)buzz(+b.dataset.i)};
+document.addEventListener('keydown',e=>{if(st!=='b1')return;const i=KEYS.indexOf(e.code);if(i>=0&&i<players.length&&!G.lock.has(players[i].ti)){e.preventDefault();buzz(i)}});
+$('bstart').onclick=()=>{$('bstart').classList.add('hide');bRun(true)};
+function bRun(fresh){
+ st='b1';if(fresh)au.currentTime=startOff;au.play().catch(()=>{});
+ $('bstat').textContent='🎵 กำลังเล่น... กดปุ่มของคุณเมื่อรู้คำตอบ';bBtns();
+ cancelAnimationFrame(raf);
+ const tick=()=>{const el=au.currentTime-startOff;$('bmeter').style.width=Math.min(100,el/MAXT*100)+'%';
+  if(el>=MAXT||au.ended)return reveal(-1);raf=requestAnimationFrame(tick)};tick();
+}
+function buzz(i){
+ if(st!=='b1')return;st='b2';G.buz=i;cancelAnimationFrame(raf);au.pause();G.el=Math.max(0,au.currentTime-startOff);
+ const p=players[i];sb(p.ti);bBtns();
+ $('bstat').textContent=`⚡ ${p.n} กดก่อน!`;$('bans').classList.remove('hide');
+ if(mode==='buzz'){$('btype').classList.remove('hide');$('bcho').classList.add('hide');acB.reset();$('bq').focus()}
+ else{$('btype').classList.add('hide');$('bcho').classList.remove('hide');renderCho()}
+ let n=ANS;$('bcd').textContent=n;clearInterval(G.cd);
+ G.cd=setInterval(()=>{n--;$('bcd').textContent=n;if(n<=0)bAns(null)},1000);
+}
+function renderCho(){
+ const c=cand().filter(x=>norm(x.v)!==norm(cur[F()])).sort(()=>Math.random()-.5).slice(0,3);
+ const o=[{v:cur[F()],s:subj==='title'?cur.artist:''},...c].sort(()=>Math.random()-.5);
+ $('bcho').innerHTML=o.map(x=>`<button class="g cho" data-v="${esc(x.v)}">${esc(x.v)}${x.s?`<small>${esc(x.s)}</small>`:''}</button>`).join('');
+}
+$('bcho').onclick=e=>{const b=e.target.closest('.cho');if(b&&st==='b2')bAns(b.dataset.v)};
+$('bok').onclick=()=>{const s=acB.get();if(s&&st==='b2')bAns(s.v)};
+function bAns(v){
+ clearInterval(G.cd);const p=players[G.buz];
+ if(v!==null&&norm(v)===norm(cur[F()])){const e=G.el;return award(p.ti,e<3?5:e<6?4:e<10?3:e<15?2:1)}
+ teams[p.ti].s-=1;G.lock.add(p.ti);$('bans').classList.add('hide');
+ if(G.lock.size>=teams.length)return reveal(-1);
+ sb(-1);bRun(false);$('bstat').textContent=`❌ ${p.n} ตอบ${v===null?'ไม่ทัน':'ผิด'} (-1) ทีมอื่นกดต่อได้!`;
+}
+</script></body></html>
